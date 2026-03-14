@@ -47,6 +47,12 @@ fn build_scores_table(results: String) -> HashMap<String, Team> {
 mod tests {
     use super::*;
 
+    // England: 4 | 1
+    // France: 3 | 2
+    // Germany: 2 | 0
+    // Italy: 0 | 1
+    // Poland: 2 | 0
+    // Spain: 0 | 0
     fn get_results() -> String {
         let results = "".to_string()
             + "England,France,4,2\n"
