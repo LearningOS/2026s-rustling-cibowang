@@ -39,6 +39,30 @@ fn build_scores_table(results: String) -> HashMap<String, Team> {
         // will be the number of goals conceded from team_2, and similarly
         // goals scored by team_2 will be the number of goals conceded by
         // team_1.
+        // the form : "<team_1_name>,<team_2_name>,<team_1_goals>,<team_2_goals>"
+        // the name of the team, goals the team scored, and goals the team conceded.
+
+        // the goal_scored for team_1 is the goal_conceded for team_2
+        // scores<team_name, team_record> where goal_scored is team_1_score, and goal_conceded is
+
+        // get the entry to the map
+        // if team_1_score > teams2_score => <team_1_name, <team_1_score, team_2_score>
+        // otherwise => <team_2_name, <team_2_score, team_1_score>
+        //
+        // if there is a team in score table, update the entry for both team_1 & team_2
+
+        scores.entry(team_1_name).or_insert(Team {
+            goals_scored: team_1_score,
+            goals_conceded: team_2_score,
+        });
+
+        scores.entry(team_2_name).or_insert(Team {
+            goals_scored: team_2_score,
+            goals_conceded: team_1_score,
+        });
+        // score & conceded both need to be sum as per team_name
+        // A:B = 5:4
+        // need to update scores when meeting KEY in another time
     }
     scores
 }
@@ -47,12 +71,6 @@ fn build_scores_table(results: String) -> HashMap<String, Team> {
 mod tests {
     use super::*;
 
-    // England: 4 | 1
-    // France: 3 | 2
-    // Germany: 2 | 0
-    // Italy: 0 | 1
-    // Poland: 2 | 0
-    // Spain: 0 | 0
     fn get_results() -> String {
         let results = "".to_string()
             + "England,France,4,2\n"
