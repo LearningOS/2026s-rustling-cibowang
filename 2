@@ -11,7 +11,6 @@
 
 use std::num::ParseIntError;
 use std::str::FromStr;
-use std::{iter, vec};
 
 #[derive(Debug, PartialEq)]
 struct Person {
@@ -32,6 +31,8 @@ enum ParsePersonError {
     ParseInt(ParseIntError),
 }
 
+// I AM NOT DONE
+
 // Steps:
 // 1. If the length of the provided string is 0, an error should be returned
 // 2. Split the given string on the commas present in it
@@ -48,40 +49,26 @@ enum ParsePersonError {
 // you want to return a string error message, you can do so via just using
 // return `Err("my error message".into())`.
 
+// I will only use ? operator
 impl FromStr for Person {
     type Err = ParsePersonError;
     fn from_str(s: &str) -> Result<Person, Self::Err> {
         if s.is_empty() {
             Err(ParsePersonError::Empty)?
         }
-        let mut it = s.split(",").collect::<Vec<&str>>();
-        let (name, age) = match it[..] {
-            [name, age] => (
-                name.to_string(),
-                age.parse().map_err(ParsePersonError::ParseInt)?,
-            ),
-            // let bad_len work in sync in all other cases!
-            _ => return Err(ParsePersonError::BadLen),
+        let mut it = s.splitn(2, ",") else {
+            Err(ParsePersonError::BadLen)?
         };
-
-        if name.is_empty() {
-            return Err(ParsePersonError::NoName);
-        }
-        //let name = it.next().unwrap().to_string();
+        let name = it.next().ok_or(ParsePersonError::NoName)?.to_string();
         // let name = String::from(it.next().unwrap());
-        //if name.is_empty() {
-        //Err(ParsePersonError::NoName)?;
-        //}
-        //let age = it
-        //    .next()
-        //    .ok_or(ParsePersonError::BadLen)?
-        //    .parse()
-        //    .map_err(ParsePersonError::ParseInt)?;
-        //if let Some(_) = it.next() {
-        //    Err(ParsePersonError::BadLen)?
-        //}
-
-        Ok(Person { name, age })
+        let age = it
+            .next()
+            .ok_or(ParsePersonError::ParseInt(ParseIntError))?
+            .parse::<usize>();
+        Ok(Person {
+            name: name,
+            age: age.into(),
+        })
     }
 }
 

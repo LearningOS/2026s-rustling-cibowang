@@ -7,6 +7,8 @@
 // Execute `rustlings hint from_into` or use the `hint` watch subcommand for a
 // hint.
 
+use std::{iter, string::ParseError};
+
 #[derive(Debug)]
 struct Person {
     name: String,
@@ -40,10 +42,30 @@ impl Default for Person {
 // If while parsing the age, something goes wrong, then return the default of
 // Person Otherwise, then return an instantiated Person object with the results
 
-// I AM NOT DONE
-
 impl From<&str> for Person {
     fn from(s: &str) -> Person {
+        if s.is_empty() {
+            return Person::default();
+        } else {
+            let mut it = s.splitn(2, ",");
+            let name = match it.next() {
+                Some("") | None => return Person::default(),
+                Some(n) => String::from(n),
+            };
+            let age = match it.next() {
+                // success or not
+                Some(a) => match a.parse::<usize>() {
+                    Ok(a) => a,
+                    Err(_) => return Person::default(),
+                },
+                None => return Person::default(),
+            };
+            match it.next() {
+                Some(_) => return Person::default(),
+                // if there is no profile provided..update
+                None => return Person { name, age },
+            }
+        }
     }
 }
 
