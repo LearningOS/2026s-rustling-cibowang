@@ -61,8 +61,7 @@ impl From<&str> for Person {
                 None => return Person::default(),
             };
             match it.next() {
-                Some(_) => return Person::default(),
-                // if there is no profile provided..update
+                Some(_) => return Person { name, age },
                 None => return Person { name, age },
             }
         }
