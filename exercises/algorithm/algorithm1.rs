@@ -41,37 +41,64 @@ impl<T> LinkedList<T> {
         }
     }
 
+    // use ptr to do
     pub fn add(&mut self, obj: T) {
+        // Box init the node & next_ptr
         let mut node = Box::new(Node::new(obj));
         node.next = None;
+        // init node_ptr from Box ptr
         let node_ptr = Some(unsafe { NonNull::new_unchecked(Box::into_raw(node)) });
         match self.end {
+            // if there is NO end_node, cursor point to start_node
             None => self.start = node_ptr,
+            // if there is an end_node, cursor point to the next to the end_node
             Some(end_ptr) => unsafe { (*end_ptr.as_ptr()).next = node_ptr },
         }
+        // re-pivot the node_ptr to the end
         self.end = node_ptr;
+        // increment the len
         self.length += 1;
     }
 
+    // use ptr to do
     pub fn get(&mut self, index: i32) -> Option<&T> {
         self.get_ith_node(self.start, index)
     }
 
+    // use ptr to do
     fn get_ith_node(&mut self, node: Option<NonNull<Node<T>>>, index: i32) -> Option<&T> {
         match node {
             None => None,
+            // if there is next_ptr, match on idx
             Some(next_ptr) => match index {
+                // if point to 0, return the pointed val
                 0 => Some(unsafe { &(*next_ptr.as_ptr()).val }),
+                // otherwise, return the next val as returned by corresponding idx in cb
                 _ => self.get_ith_node(unsafe { (*next_ptr.as_ptr()).next }, index - 1),
             },
         }
     }
     pub fn merge(list_a: LinkedList<T>, list_b: LinkedList<T>) -> Self {
-        let mut list_a = LinkedList::new();
-        let mut list_b = LinkedList::new();
-        let list_length = match (list_a.length + list_b.length) {
-            0 => 0,
+        match (list_a, list_b) {
+            (None, None) => Self::new(),
+            (Some(a), None) => a,
+            (None, Some(b)) => b,
+            (Some(a), Some(b)) => {
+                let mut new_list = Self::new();
+                let mut a_ptr = a;
+                let mut b_ptr = b;
 
+                while a_ptr.is_some() && b_ptr.is_some() {
+                    if a_ptr.val < b_ptr.val {
+                        new_list.add(a_ptr.val);
+                        a_ptr = a_ptr.next;
+                    } else {
+                        new_list.add(b_ptr.val);
+                        b_ptr = b_ptr.next;
+                    }
+                }
+                new_list
+            }
         }
         Self {
             length: 0,
